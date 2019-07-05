@@ -1,10 +1,10 @@
-# salahtime-go
+# salahtime
 
-salahtime-go is a small command line application written in Go that displays the Islamic prayer times for Europe/Copenhagen.
+Salahtime is a small command line application written in Go that displays the Islamic prayer times for Europe/Copenhagen.
 
-salahtime-go uses a slice to store the Europe/Copenhagen time table and the table can easily be substituted for another if needed.
+Salahtime uses a slice to store the Europe/Copenhagen time table and the table can easily be substituted for another city.
 
-salahtime-go automatically detects if daylight saving (CEST) is on and compensates by adding an hour to each time in the table.
+Salahtime automatically detects if daylight saving (CEST) is on and compensates by adding an hour to each prayer time in the table.
 
 ## Installation
 
