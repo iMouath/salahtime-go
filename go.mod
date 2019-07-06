@@ -1,3 +1,3 @@
-module github.com/unixsheikh/salahtime-go:v.1.0.0
+module github.com/unixsheikh/salahtime-go
 
 go 1.12
