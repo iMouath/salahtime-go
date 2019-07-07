@@ -1,4 +1,5 @@
-// Salahtime prints the Islamic prayer time for Europe/Copenhagen.
+// salahtime-go prints the Islamic prayer time for Europe/Copenhagen with auto
+// detection of daylight savings settings.
 package main
 
 import (
@@ -8,9 +9,8 @@ import (
 
 // fixDaylightSavings adds an hour to the time if it is CEST.
 func fixDaylightSavings(zonename, timeValue string) string {
-	t, _ := time.Parse("15:04", timeValue)
-
 	if zonename == "CEST" {
+		t, _ := time.Parse("15:04", timeValue)
 		return t.Add(time.Hour * 1).Format("15:04")
 	}
 	return timeValue
@@ -22,8 +22,12 @@ func main() {
 	// memory. Iterating over a map requires traversing the key and doing
 	// lookups into the hash-table structure. So we'll just use a slice for
 	// the time table.
-	// Europe/Copenhagen time table.
-	y := []string{
+	//
+	// The Europe/Copenhagen prayer time table is based upon observation, yet
+	// it does not take into account changes during the twilight season (late
+	// April until early August). For that period the time is calculated using
+	// the most precise method.
+	pt := []string{
 		"01-01", "17:41", "15:51", "13:35", "12:15", "08:37", "06:40",
 		"01-02", "17:42", "15:52", "13:36", "12:15", "08:37", "06:40",
 		"01-03", "17:43", "15:53", "13:37", "12:16", "08:36", "06:40",
@@ -391,34 +395,33 @@ func main() {
 		"12-30", "17:39", "15:48", "13:33", "12:14", "08:37", "06:40",
 		"12-31", "17:40", "15:49", "13:34", "12:14", "08:37", "06:40",
 	}
-
-	dateToday := time.Now().Format("02/01-2006")
-
-	fmt.Printf("\nDate today %s\n\n", dateToday)
-	fmt.Println("---------------------")
-
-	date := time.Now().Format("01-02")
-	tablelen := len(y)
+	
+	dayMonthYear := time.Now().Format("02/01-2006")
+	monthAndDay := time.Now().Format("01-02")
+	clockNow := time.Now().Format("15:04")
 
 	myTimeZone, _ := time.LoadLocation("Europe/Copenhagen")
-
 	// zonename is Central European Time (CET) or Central European Summer Time (CEST).
 	zonename, _ := time.Now().In(myTimeZone).Zone()
 
+	fmt.Printf("\nDate today %s\n\n", dayMonthYear)
+	fmt.Println("---------------------")
+
 	// We count by 7 in order to only match the date fields in the slice.
+	tablelen := len(pt)
 	for i := 0; i < tablelen; i += 7 {
-		if y[i] == date {
-			fmt.Printf("Fajr:\t\t%s\n", fixDaylightSavings(zonename, y[i+6]))
-			fmt.Printf("Shuruk:\t\t%s\n", fixDaylightSavings(zonename, y[i+5]))
-			fmt.Printf("Dhuhr:\t\t%s\n", fixDaylightSavings(zonename, y[i+4]))
-			fmt.Printf("Asr:\t\t%s\n", fixDaylightSavings(zonename, y[i+3]))
-			fmt.Printf("Maghrib:\t%s\n", fixDaylightSavings(zonename, y[i+2]))
-			fmt.Printf("Isha:\t\t%s\n", fixDaylightSavings(zonename, y[i+1]))
+		if pt[i] == monthAndDay {
+			fmt.Printf("Fajr:\t\t%s\n", fixDaylightSavings(zonename, pt[i+6]))
+			fmt.Printf("Shuruk:\t\t%s\n", fixDaylightSavings(zonename, pt[i+5]))
+			fmt.Printf("Dhuhr:\t\t%s\n", fixDaylightSavings(zonename, pt[i+4]))
+			fmt.Printf("Asr:\t\t%s\n", fixDaylightSavings(zonename, pt[i+3]))
+			fmt.Printf("Maghrib:\t%s\n", fixDaylightSavings(zonename, pt[i+2]))
+			fmt.Printf("Isha:\t\t%s\n", fixDaylightSavings(zonename, pt[i+1]))
 		}
 	}
 
 	fmt.Println("---------------------")
-	fmt.Printf("\nTime is now:\t%s\n\n", time.Now().Format("15:04"))
+	fmt.Printf("\nTime is now:\t%s\n\n", clockNow)
 
 	if zonename == "CEST" {
 		fmt.Printf("Daylight saving:   On\n\n")
