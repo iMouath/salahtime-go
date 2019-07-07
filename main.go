@@ -1,4 +1,4 @@
-// salahtime prints the Islamic prayer time for Europe/Copenhagen.
+// Salahtime prints the Islamic prayer time for Europe/Copenhagen.
 package main
 
 import (
@@ -9,14 +9,11 @@ import (
 // MyTime gets the local timezone.
 var MyTime, _ = time.LoadLocation("Europe/Copenhagen")
 
-// Zonename is Central European Time (CET) or Central European Summer Time (CEST).
-var Zonename, _ = time.Now().In(MyTime).Zone()
-
 // fixDaylightSavings adds an hour to the time if it is CEST.
-func fixDaylightSavings(timeValue string) string {
+func fixDaylightSavings(zonename, timeValue string) string {
 	t, _ := time.Parse("15:04", timeValue)
 
-	if Zonename == "CEST" {
+	if zonename == "CEST" {
 		return t.Add(time.Hour * 1).Format("15:04")
 	}
 	return timeValue
@@ -406,22 +403,25 @@ func main() {
 	date := time.Now().Format("01-02")
 	tablelen := len(y)
 
+	// zonename is Central European Time (CET) or Central European Summer Time (CEST).
+	zonename, _ := time.Now().In(MyTime).Zone()
+
 	// We count by 7 in order to only match the date fields in the slice.
 	for i := 0; i < tablelen; i += 7 {
 		if y[i] == date {
-			fmt.Printf("Fajr:\t\t%s\n", fixDaylightSavings(y[i+6]))
-			fmt.Printf("Shuruk:\t\t%s\n", fixDaylightSavings(y[i+5]))
-			fmt.Printf("Dhuhr:\t\t%s\n", fixDaylightSavings(y[i+4]))
-			fmt.Printf("Asr:\t\t%s\n", fixDaylightSavings(y[i+3]))
-			fmt.Printf("Maghrib:\t%s\n", fixDaylightSavings(y[i+2]))
-			fmt.Printf("Isha:\t\t%s\n", fixDaylightSavings(y[i+1]))
+			fmt.Printf("Fajr:\t\t%s\n", fixDaylightSavings(zonename, y[i+6]))
+			fmt.Printf("Shuruk:\t\t%s\n", fixDaylightSavings(zonename, y[i+5]))
+			fmt.Printf("Dhuhr:\t\t%s\n", fixDaylightSavings(zonename, y[i+4]))
+			fmt.Printf("Asr:\t\t%s\n", fixDaylightSavings(zonename, y[i+3]))
+			fmt.Printf("Maghrib:\t%s\n", fixDaylightSavings(zonename, y[i+2]))
+			fmt.Printf("Isha:\t\t%s\n", fixDaylightSavings(zonename, y[i+1]))
 		}
 	}
 
 	fmt.Println("---------------------")
 	fmt.Printf("\nTime is now:\t%s\n\n", time.Now().Format("15:04"))
 
-	if Zonename == "CEST" {
+	if zonename == "CEST" {
 		fmt.Printf("Daylight saving:   On\n\n")
 	}
 }
