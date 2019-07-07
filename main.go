@@ -6,9 +6,6 @@ import (
 	"time"
 )
 
-// MyTime gets the local timezone.
-var MyTime, _ = time.LoadLocation("Europe/Copenhagen")
-
 // fixDaylightSavings adds an hour to the time if it is CEST.
 func fixDaylightSavings(zonename, timeValue string) string {
 	t, _ := time.Parse("15:04", timeValue)
@@ -403,8 +400,10 @@ func main() {
 	date := time.Now().Format("01-02")
 	tablelen := len(y)
 
+	myTimeZone, _ := time.LoadLocation("Europe/Copenhagen")
+
 	// zonename is Central European Time (CET) or Central European Summer Time (CEST).
-	zonename, _ := time.Now().In(MyTime).Zone()
+	zonename, _ := time.Now().In(myTimeZone).Zone()
 
 	// We count by 7 in order to only match the date fields in the slice.
 	for i := 0; i < tablelen; i += 7 {
